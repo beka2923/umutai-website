@@ -1,1 +1,589 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Умутайга 💕</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
 
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+    padding: 20px;
+  }
+
+  /* Жүрөкчөлөр */
+  .heart {
+    position: absolute;
+    color: #ff4d6d;
+    font-size: 20px;
+    animation: float 6s infinite ease-in-out;
+    opacity: 0.7;
+    pointer-events: none;
+    z-index: 1;
+  }
+  @keyframes float {
+    0% { transform: translateY(100vh) scale(0); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateY(-100px) scale(1.2); opacity: 0; }
+  }
+
+  /* Пароль экраны */
+  #loginScreen {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px 35px;
+    border-radius: 25px;
+    box-shadow: 0 20px 50px rgba(255, 77, 109, 0.3);
+    text-align: center;
+    z-index: 10;
+    max-width: 380px;
+    width: 90%;
+    animation: pop 0.6s ease;
+  }
+  @keyframes pop {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  #loginScreen h2 {
+    color: #ff4d6d;
+    margin-bottom: 20px;
+    font-size: 24px;
+  }
+
+  #loginScreen input {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #ffb3c1;
+    border-radius: 12px;
+    font-size: 16px;
+    text-align: center;
+    outline: none;
+    transition: 0.3s;
+  }
+  #loginScreen input:focus {
+    border-color: #ff4d6d;
+    box-shadow: 0 0 15px rgba(255, 77, 109, 0.3);
+  }
+
+  #loginScreen button {
+    margin-top: 15px;
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #ff4d6d, #ff8fa3);
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  #loginScreen button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(255, 77, 109, 0.4);
+  }
+
+  #errorMsg {
+    color: #d90429;
+    margin-top: 12px;
+    font-size: 14px;
+    min-height: 20px;
+  }
+
+  /* Негизги контейнер */
+  #mainContent {
+    display: none;
+    max-width: 650px;
+    width: 95%;
+    z-index: 10;
+    position: relative;
+  }
+
+  .page {
+    display: none;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px 30px;
+    border-radius: 25px;
+    box-shadow: 0 20px 50px rgba(255, 77, 109, 0.3);
+    text-align: center;
+    animation: fadeIn 0.6s ease;
+    min-height: 480px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .page.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .page h1 {
+    font-size: 38px;
+    background: linear-gradient(135deg, #ff4d6d, #c9184a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 15px;
+  }
+
+  .subtitle {
+    font-size: 17px;
+    color: #ff4d6d;
+    margin-bottom: 20px;
+  }
+
+  .letter {
+    background: #fff0f3;
+    border-left: 5px solid #ff4d6d;
+    padding: 22px;
+    border-radius: 15px;
+    text-align: left;
+    line-height: 1.9;
+    font-size: 16px;
+    color: #590d22;
+    margin-bottom: 20px;
+    width: 100%;
+  }
+
+  .big-heart {
+    font-size: 70px;
+    animation: beat 1.2s infinite;
+    margin: 10px 0;
+  }
+  @keyframes beat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.25); }
+  }
+
+  .emoji-row {
+    font-size: 32px;
+    letter-spacing: 8px;
+    margin-top: 10px;
+  }
+
+  /* Навигация */
+  .nav {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .nav button {
+    padding: 12px 22px;
+    border: none;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #ff4d6d;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 5px 15px rgba(255, 77, 109, 0.2);
+  }
+  .nav button:hover {
+    transform: translateY(-2px);
+    background: #ff4d6d;
+    color: white;
+  }
+  .nav button.active {
+    background: linear-gradient(135deg, #ff4d6d, #c9184a);
+    color: white;
+    box-shadow: 0 8px 20px rgba(255, 77, 109, 0.4);
+  }
+
+  .dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 15px;
+  }
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    transition: 0.3s;
+  }
+  .dot.active {
+    background: #ff4d6d;
+    width: 25px;
+    border-radius: 5px;
+  }
+
+  .quote {
+    font-style: italic;
+    color: #c9184a;
+    font-size: 18px;
+    margin: 15px 0;
+    line-height: 1.7;
+  }
+
+  /* ===== 4-БЕТ: Сунуш ===== */
+  #page4 {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .proposal-date {
+    font-size: 22px;
+    font-weight: bold;
+    color: #c9184a;
+    background: #fff0f3;
+    padding: 10px 20px;
+    border-radius: 15px;
+    display: inline-block;
+    margin: 15px 0;
+    border: 2px dashed #ff4d6d;
+  }
+
+  .proposal-question {
+    font-size: 26px;
+    color: #ff4d6d;
+    font-weight: bold;
+    margin: 20px 0;
+    line-height: 1.5;
+  }
+
+  .proposal-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 25px;
+    flex-wrap: wrap;
+    min-height: 80px;
+  }
+
+  .btn-yes {
+    padding: 18px 45px;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #ff4d6d, #c9184a);
+    color: white;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 25px rgba(255, 77, 109, 0.5);
+    transform-origin: center;
+  }
+  .btn-yes:hover {
+    transform: scale(1.08);
+    box-shadow: 0 15px 35px rgba(255, 77, 109, 0.6);
+  }
+
+  .btn-no {
+    padding: 18px 45px;
+    border: 2px solid #ff4d6d;
+    border-radius: 50px;
+    background: white;
+    color: #ff4d6d;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  /* Роза жалбырактары */
+  .petal {
+    position: fixed;
+    top: -50px;
+    font-size: 30px;
+    z-index: 9999;
+    pointer-events: none;
+    animation: fall linear forwards;
+  }
+  @keyframes fall {
+    0% {
+      transform: translateY(0) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(110vh) rotate(720deg);
+      opacity: 0.3;
+    }
+  }
+
+  /* Шарлар */
+  .balloon {
+    position: fixed;
+    bottom: -150px;
+    font-size: 50px;
+    z-index: 9998;
+    pointer-events: none;
+    animation: flyUp linear forwards;
+  }
+  @keyframes flyUp {
+    0% {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-120vh) scale(1.3);
+      opacity: 0;
+    }
+  }
+
+  /* Куттуктоо экраны */
+  #congratsScreen {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 240, 243, 0.96);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    text-align: center;
+    padding: 30px;
+    animation: fadeIn 0.8s ease;
+  }
+  #congratsScreen.show { display: flex; }
+
+  #congratsScreen h1 {
+    font-size: 48px;
+    background: linear-gradient(135deg, #ff4d6d, #c9184a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 20px;
+    animation: beat 1.5s infinite;
+  }
+
+  #congratsScreen p {
+    font-size: 20px;
+    color: #590d22;
+    line-height: 1.8;
+    max-width: 500px;
+  }
+
+  @media (max-width: 500px) {
+    .page h1 { font-size: 28px; }
+    .page { padding: 30px 20px; min-height: 420px; }
+    .nav button { padding: 10px 16px; font-size: 13px; }
+    .big-heart { font-size: 55px; }
+    .proposal-question { font-size: 20px; }
+    .btn-yes, .btn-no { padding: 14px 32px; font-size: 18px; }
+    #congratsScreen h1 { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Пароль экраны -->
+  <div id="loginScreen">
+    <h2>💗 Ким кирип атат? 💗</h2>
+    <input type="password" id="passwordInput" placeholder="Паролду жаз..." maxlength="10">
+    <button onclick="checkPassword()">Кирүү 💕</button>
+    <div id="errorMsg"></div>
+  </div>
+
+  <!-- Негизги мазмун (4 бет) -->
+  <div id="mainContent">
+
+    <!-- 1-БЕТ -->
+    <div class="page active" id="page1">
+      <h1>Умутай 💖</h1>
+      <p class="subtitle">Сага арналган баракча</p>
+      <div class="big-heart">❤️</div>
+      <div class="letter">
+        <p>Салам, Умутай! 🌸</p>
+        <br>
+        <p>Бул сайт сен үчүн гана жасалды. Сен менин жүрөгүмдүн эң жылуу бурчундасың. Сенин жылмайганың — менин күнүмдүн эң жаркын учуру. 💕</p>
+      </div>
+      <div class="emoji-row">😊💕✨</div>
+    </div>
+
+    <!-- 2-БЕТ -->
+    <div class="page" id="page2">
+      <h1>Сага катым 💌</h1>
+      <div class="letter">
+        <p>Умутай, сен мага абдан кымбатсың. 🌷</p>
+        <br>
+        <p>Ар бир күнүң кубаныч, бакыт жана жылмайуу менен өтсүн. Сен дүйнөдөгү эң сулуу жана эң жакшы адамсың.</p>
+        <br>
+        <p>Сенин күлкүң — менин эң сүйүктүү музыка. Сенин жылмайганың — менин эң чоң бактым. ✨</p>
+      </div>
+      <div class="emoji-row">💗💖💗</div>
+    </div>
+
+    <!-- 3-БЕТ -->
+    <div class="page" id="page3">
+      <h1>Жылмайуу каалайм 😊</h1>
+      <p class="quote">"Жылмайуу — бул бекер, бирок ал көп нерсени берет"</p>
+      <div class="letter">
+        <p>Умутай, сага ар дайым жылмайуу каалайм! 😊</p>
+        <br>
+        <p>Кайгыланган күндөрүңдө да жылмайып, жашоонун кооздугун көрө бил. Сен жылмайганда дүйнө да жылмаят. 🌍💕</p>
+        <br>
+        <p>Ар бир таңың шаттык менен башталсын, ар бир кечиң жылуулук менен бүтсүн. 🌅</p>
+      </div>
+      <div class="emoji-row">😊😄😊</div>
+    </div>
+
+    <!-- 4-БЕТ: ТУРМУШКА ЧЫГУУ СУНУШУ -->
+    <div class="page" id="page4">
+      <h1>Маанилүү суроо 💍</h1>
+      <div class="proposal-date">📅 2029.09.09</div>
+      <p class="proposal-question">
+        Умутай, 2029-жылдын 9-сентябрында<br>
+        турмушка чыгууга макулсуңбу? 💕
+      </p>
+      <div class="proposal-buttons">
+        <button class="btn-yes" id="btnYes" onclick="sayYes()">Ооба 💖</button>
+        <button class="btn-no" id="btnNo" onclick="sayNo()">Жок</button>
+      </div>
+      <div class="emoji-row" style="margin-top:25px;">💍💐💕</div>
+    </div>
+
+    <!-- Навигация -->
+    <div class="nav">
+      <button class="active" onclick="showPage(1)">1-бет</button>
+      <button onclick="showPage(2)">2-бет</button>
+      <button onclick="showPage(3)">3-бет</button>
+      <button onclick="showPage(4)">4-бет</button>
+    </div>
+
+    <div class="dots">
+      <div class="dot active" id="dot1"></div>
+      <div class="dot" id="dot2"></div>
+      <div class="dot" id="dot3"></div>
+      <div class="dot" id="dot4"></div>
+    </div>
+
+  </div>
+
+  <!-- Куттуктоо экраны -->
+  <div id="congratsScreen">
+    <h1>Урааа! 🎉💖</h1>
+    <p>
+      Умутай макул болду! 💍✨<br><br>
+      Сен менин жашоомдун эң бактылуу адамсың!<br>
+      2029.09.09 — биздин күнүбүз! 🌹💕
+    </p>
+    <div class="emoji-row" style="font-size:50px; margin-top:25px;">💐💖🌹</div>
+  </div>
+
+<script>
+  // ===== Пароль =====
+  function checkPassword() {
+    const input = document.getElementById('passwordInput').value;
+    const error = document.getElementById('errorMsg');
+    if (input === '2010') {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('mainContent').style.display = 'block';
+    } else {
+      error.textContent = '❌ Пароль туура эмес! Кайра аракет кыл.';
+      document.getElementById('passwordInput').value = '';
+    }
+  }
+  document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') checkPassword();
+  });
+
+  // ===== Беттерди которуу =====
+  function showPage(num) {
+    for (let i = 1; i <= 4; i++) {
+      document.getElementById('page' + i).classList.remove('active');
+      document.querySelectorAll('.nav button')[i-1].classList.remove('active');
+      document.getElementById('dot' + i).classList.remove('active');
+    }
+    document.getElementById('page' + num).classList.add('active');
+    document.querySelectorAll('.nav button')[num-1].classList.add('active');
+    document.getElementById('dot' + num).classList.add('active');
+  }
+
+  // ===== "Жок" басканда "Ооба" чоңоюп кетет =====
+  let yesScale = 1;
+  let noCount = 0;
+  const noTexts = ['Жок', 'Жок...', 'Чын элеби?', 'Ойлонуп көр', 'Жок дебе', 'Кайра ойлон', 'Туура эмес', 'Жок!?'];
+
+  function sayNo() {
+    noCount++;
+    yesScale += 0.35;
+
+    const btnYes = document.getElementById('btnYes');
+    const btnNo = document.getElementById('btnNo');
+
+    btnYes.style.transform = `scale(${yesScale})`;
+
+    // "Жок" басканда кичирейип, тексти өзгөрөт
+    if (noCount < noTexts.length) {
+      btnNo.textContent = noTexts[noCount];
+    }
+    btnNo.style.transform = `scale(${Math.max(0.4, 1 - noCount * 0.12)})`;
+    btnNo.style.opacity = Math.max(0.3, 1 - noCount * 0.12);
+  }
+
+  // ===== "Ооба" басканда =====
+  function sayYes() {
+    // Шарларды жардыруу
+    launchBalloons();
+    // Роза жалбырактарын төгүү
+    launchPetals();
+
+    // Куттуктоо экранын көрсөтүү
+    setTimeout(() => {
+      document.getElementById('congratsScreen').classList.add('show');
+    }, 1200);
+  }
+
+  // ===== Шарлар =====
+  function launchBalloons() {
+    const balloonEmojis = ['🎈', '🎈', '🎈', '🎉', '🎊'];
+    for (let i = 0; i < 30; i++) {
+      setTimeout(() => {
+        const balloon = document.createElement('div');
+        balloon.classList.add('balloon');
+        balloon.textContent = balloonEmojis[Math.floor(Math.random() * balloonEmojis.length)];
+        balloon.style.left = Math.random() * 100 + 'vw';
+        balloon.style.animationDuration = (Math.random() * 2 + 3) + 's';
+        balloon.style.fontSize = (Math.random() * 30 + 40) + 'px';
+        document.body.appendChild(balloon);
+        setTimeout(() => balloon.remove(), 6000);
+      }, i * 60);
+    }
+  }
+
+  // ===== Роза жалбырактары =====
+  function launchPetals() {
+    const petalEmojis = ['🌹', '🌸', '🌺', '💐', '🌷', '🥀'];
+    for (let i = 0; i < 60; i++) {
+      setTimeout(() => {
+        const petal = document.createElement('div');
+        petal.classList.add('petal');
+        petal.textContent = petalEmojis[Math.floor(Math.random() * petalEmojis.length)];
+        petal.style.left = Math.random() * 100 + 'vw';
+        petal.style.animationDuration = (Math.random() * 3 + 4) + 's';
+        petal.style.fontSize = (Math.random() * 25 + 20) + 'px';
+        document.body.appendChild(petal);
+        setTimeout(() => petal.remove(), 8000);
+      }, i * 80);
+    }
+  }
+
+  // ===== Учуучу жүрөкчөлөр =====
+  function createHeart() {
+    const heart = document.createElement('div');
+    heart.classList.add('heart');
+    heart.innerHTML = ['❤️','💕','💖','💗','💓'][Math.floor(Math.random()*5)];
+    heart.style.left = Math.random() * 100 + 'vw';
+    heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+    heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 7000);
+  }
+  setInterval(createHeart, 400);
+</script>
+
+</body>
+</html>git pull origin main --allow-unrelated-histories
